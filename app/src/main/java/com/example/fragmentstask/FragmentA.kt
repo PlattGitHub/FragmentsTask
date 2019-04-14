@@ -33,7 +33,7 @@ class FragmentA : Fragment() {
         if (context is OnButtonClickListener) {
             listener = context
         } else {
-            throw RuntimeException("$context must implement OnFragmentInteractionListener")
+            throw RuntimeException("$context must implement OnButtonClickListener")
         }
     }
 
