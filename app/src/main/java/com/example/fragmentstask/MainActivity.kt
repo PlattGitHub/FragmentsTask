@@ -2,6 +2,7 @@ package com.example.fragmentstask
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 
 /**
@@ -11,9 +12,10 @@ import android.support.v7.app.AppCompatActivity
  *
  * @author Alexander Gorin
  */
-class MainActivity : AppCompatActivity(), FragmentA.OnButtonClickListener {
+class MainActivity : AppCompatActivity(), FragmentA.FragmentCallbacks {
 
     var counter = 0
+    var fragmentsTagToShowAfterRotation: String = ""
     private val portrait
         get() = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     private val landscape
@@ -22,15 +24,22 @@ class MainActivity : AppCompatActivity(), FragmentA.OnButtonClickListener {
     override fun onButtonClicked() {
         counter++
         if (portrait) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_a_container, FragmentB.newInstance(counter), FragmentB.TAG)
-                .addToBackStack(null)
-                .commit()
+            fragmentsTagToShowAfterRotation = FragmentB.TAG
+            replaceFragment(
+                container = R.id.fragment_a_container,
+                fragment = FragmentB.newInstance(counter),
+                tag = FragmentB.TAG,
+                backStack = true
+            )
         }
         if (landscape) {
             val fragmentB = supportFragmentManager.findFragmentByTag(FragmentB.TAG) as FragmentB?
             fragmentB?.setClicks(counter)
         }
+    }
+
+    override fun onShowFragment() {
+        if (portrait) fragmentsTagToShowAfterRotation = FragmentA.TAG
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,25 +48,75 @@ class MainActivity : AppCompatActivity(), FragmentA.OnButtonClickListener {
 
         if (savedInstanceState != null) {
             counter = savedInstanceState.getInt(COUNTER_KEY)
+            fragmentsTagToShowAfterRotation = savedInstanceState.getString(CURRENT_FRAGMENT) ?: ""
         }
 
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_a_container, FragmentA.newInstance()).commit()
+        if (portrait) {
+            if (fragmentsTagToShowAfterRotation.isNotEmpty()) {
+                when (fragmentsTagToShowAfterRotation) {
+                    FragmentA.TAG -> {
+                        replaceFragment(
+                            container = R.id.fragment_a_container,
+                            fragment = FragmentA.newInstance()
+                        )
+                    }
+                    FragmentB.TAG -> {
+                        replaceFragment(
+                            container = R.id.fragment_a_container,
+                            fragment = FragmentB.newInstance(counter),
+                            tag = FragmentB.TAG
+                        )
+                    }
+                }
+            } else {
+                replaceFragment(R.id.fragment_a_container, FragmentA.newInstance())
+            }
+        }
 
         if (landscape) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_b_container, FragmentB.newInstance(counter), FragmentB.TAG)
-                .commit()
+            replaceFragment(
+                container = R.id.fragment_a_container,
+                fragment = FragmentA.newInstance()
+            )
+            replaceFragment(
+                container = R.id.fragment_b_container,
+                fragment = FragmentB.newInstance(counter),
+                tag = FragmentB.TAG
+            )
+        }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        if (landscape) {
+            finish()
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         outState?.putInt(COUNTER_KEY, counter)
+        outState?.putString(CURRENT_FRAGMENT, fragmentsTagToShowAfterRotation)
     }
 
     private companion object {
         const val COUNTER_KEY = "COUNTER"
+        const val CURRENT_FRAGMENT = "CURRENT_FRAGMENT"
     }
+
+    private fun replaceFragment(
+        container: Int,
+        fragment: Fragment,
+        tag: String? = null,
+        backStack: Boolean = false
+    ) {
+        supportFragmentManager.beginTransaction()
+            .replace(container, fragment, tag)
+            .apply {
+                if (backStack) addToBackStack(null)
+            }.commit()
+    }
+
+
 }
 

@@ -9,13 +9,13 @@ import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_a.view.*
 
 /**
- * Simple fragment that has Button and callback to notify [MainActivity]
+ * Simple fragment that has Button and callbacks to notify [MainActivity]
  *
  * @author Alexander Gorin
  */
 class FragmentA : Fragment() {
 
-    private var listener: OnButtonClickListener? = null
+    private var listener: FragmentCallbacks? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,11 +30,16 @@ class FragmentA : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        if (context is OnButtonClickListener) {
+        if (context is FragmentCallbacks) {
             listener = context
         } else {
-            throw RuntimeException("$context must implement OnButtonClickListener")
+            throw RuntimeException("$context must implement FragmentCallbacks")
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        listener?.onShowFragment()
     }
 
     override fun onDetach() {
@@ -42,11 +47,15 @@ class FragmentA : Fragment() {
         listener = null
     }
 
-    interface OnButtonClickListener {
+    interface FragmentCallbacks {
         fun onButtonClicked()
+        fun onShowFragment()
     }
 
     companion object {
         fun newInstance() = FragmentA()
+        const val TAG = "TAG_FRAGMENT_A"
     }
+
+
 }
