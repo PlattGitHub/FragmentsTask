@@ -56,6 +56,4 @@ class FragmentA : Fragment() {
         fun newInstance() = FragmentA()
         const val TAG = "TAG_FRAGMENT_A"
     }
-
-
 }

@@ -14,8 +14,8 @@ import android.support.v7.app.AppCompatActivity
  */
 class MainActivity : AppCompatActivity(), FragmentA.FragmentCallbacks {
 
-    var counter = 0
-    var fragmentsTagToShowAfterRotation: String = ""
+    private var counter = 0
+    private var fragmentsTagToShowAfterRotation: String = ""
     private val portrait
         get() = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     private val landscape
@@ -54,19 +54,16 @@ class MainActivity : AppCompatActivity(), FragmentA.FragmentCallbacks {
         if (portrait) {
             if (fragmentsTagToShowAfterRotation.isNotEmpty()) {
                 when (fragmentsTagToShowAfterRotation) {
-                    FragmentA.TAG -> {
-                        replaceFragment(
-                            container = R.id.fragment_a_container,
-                            fragment = FragmentA.newInstance()
-                        )
-                    }
-                    FragmentB.TAG -> {
-                        replaceFragment(
-                            container = R.id.fragment_a_container,
-                            fragment = FragmentB.newInstance(counter),
-                            tag = FragmentB.TAG
-                        )
-                    }
+                    FragmentA.TAG -> replaceFragment(
+                        container = R.id.fragment_a_container,
+                        fragment = FragmentA.newInstance()
+                    )
+
+                    FragmentB.TAG -> replaceFragment(
+                        container = R.id.fragment_a_container,
+                        fragment = FragmentB.newInstance(counter),
+                        tag = FragmentB.TAG
+                    )
                 }
             } else {
                 replaceFragment(R.id.fragment_a_container, FragmentA.newInstance())
@@ -88,9 +85,7 @@ class MainActivity : AppCompatActivity(), FragmentA.FragmentCallbacks {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        if (landscape) {
-            finish()
-        }
+        if (landscape) finish()
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
@@ -116,7 +111,5 @@ class MainActivity : AppCompatActivity(), FragmentA.FragmentCallbacks {
                 if (backStack) addToBackStack(null)
             }.commit()
     }
-
-
 }
 
