@@ -54,6 +54,5 @@ class FragmentA : Fragment() {
 
     companion object {
         fun newInstance() = FragmentA()
-        const val TAG = "TAG_FRAGMENT_A"
     }
 }

@@ -15,7 +15,7 @@ import android.support.v7.app.AppCompatActivity
 class MainActivity : AppCompatActivity(), FragmentA.FragmentCallbacks {
 
     private var counter = 0
-    private var fragmentsTagToShowAfterRotation: String = ""
+    private var fragmentAfterRotationName: String = ""
     private val portrait
         get() = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     private val landscape
@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity(), FragmentA.FragmentCallbacks {
     override fun onButtonClicked() {
         counter++
         if (portrait) {
-            fragmentsTagToShowAfterRotation = FragmentB.TAG
+            fragmentAfterRotationName = FRAGMENT_B
             replaceFragment(
                 container = R.id.fragment_a_container,
                 fragment = FragmentB.newInstance(counter),
@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity(), FragmentA.FragmentCallbacks {
     }
 
     override fun onShowFragment() {
-        if (portrait) fragmentsTagToShowAfterRotation = FragmentA.TAG
+        if (portrait) fragmentAfterRotationName = FRAGMENT_A
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,18 +48,17 @@ class MainActivity : AppCompatActivity(), FragmentA.FragmentCallbacks {
 
         if (savedInstanceState != null) {
             counter = savedInstanceState.getInt(COUNTER_KEY)
-            fragmentsTagToShowAfterRotation = savedInstanceState.getString(CURRENT_FRAGMENT) ?: ""
+            fragmentAfterRotationName = savedInstanceState.getString(CURRENT_FRAGMENT) ?: ""
         }
 
         if (portrait) {
-            if (fragmentsTagToShowAfterRotation.isNotEmpty()) {
-                when (fragmentsTagToShowAfterRotation) {
-                    FragmentA.TAG -> replaceFragment(
+            if (fragmentAfterRotationName.isNotEmpty()) {
+                when (fragmentAfterRotationName) {
+                    FRAGMENT_A -> replaceFragment(
                         container = R.id.fragment_a_container,
                         fragment = FragmentA.newInstance()
                     )
-
-                    FragmentB.TAG -> replaceFragment(
+                    FRAGMENT_B -> replaceFragment(
                         container = R.id.fragment_a_container,
                         fragment = FragmentB.newInstance(counter),
                         tag = FragmentB.TAG
@@ -91,12 +90,14 @@ class MainActivity : AppCompatActivity(), FragmentA.FragmentCallbacks {
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         outState?.putInt(COUNTER_KEY, counter)
-        outState?.putString(CURRENT_FRAGMENT, fragmentsTagToShowAfterRotation)
+        outState?.putString(CURRENT_FRAGMENT, fragmentAfterRotationName)
     }
 
     private companion object {
         const val COUNTER_KEY = "COUNTER"
         const val CURRENT_FRAGMENT = "CURRENT_FRAGMENT"
+        const val FRAGMENT_A = "FRAGMENT_A"
+        const val FRAGMENT_B = "FRAGMENT_B"
     }
 
     private fun replaceFragment(
