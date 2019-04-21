@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 
 /**
  * Activity that displays fragments depending on orientation of the device.
@@ -45,6 +46,7 @@ class MainActivity : AppCompatActivity(), FragmentA.FragmentCallbacks {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        Log.d("asdasd", "onCreateActivity")
 
         if (savedInstanceState != null) {
             counter = savedInstanceState.getInt(COUNTER_KEY)
